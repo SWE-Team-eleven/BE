@@ -54,7 +54,7 @@ class TicketServiceTest {
         ticketDto.setMilestone(new Milestone());
         ticketDto.setReporter(new Users());
         ticketDto.setPriority(Priority.Major);
-        ticketDto.setComponent(Component.BACKEND);
+        ticketDto.setComponent(Component.UIComponent);
         ticketDto.setDescription("Test description");
         ticketDto.setTitle("Test title");
 
@@ -112,7 +112,7 @@ class TicketServiceTest {
         ticket.setPriority(Priority.Major);
         ticket.setCreatedTime(LocalDateTime.now());
         ticket.setModifiedTime(LocalDateTime.now());
-        ticket.setComponent(Component.BACKEND);
+        ticket.setComponent(Component.UIComponent);
         ticket.setDeveloper(new Users());
         ticket.setReporter(new Users());
         ticket.setMilestone(new Milestone());
