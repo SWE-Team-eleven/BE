@@ -61,6 +61,7 @@ public class TicketController {
         return ticketService.readDetailTicket(ticketId);
     }
 
+
     @GetMapping("/read/ticket/statistics/{projectId}")
     @Operation(summary = "티켓 status 통계", description = "projectId로 프로젝트 내 티켓 정보 반환",
             responses = {

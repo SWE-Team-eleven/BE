@@ -38,7 +38,7 @@ public class ProjectService {
         projectRepository.save(project);
 
         for (ManageUserAccountReq manageUserAccountReq : createProjectReq.getManageUserAccounts()) {
-            Users user = usersRepository.findByEmail(manageUserAccountReq.getUserEmail()).orElseThrow(() -> new Exception("User not found"));
+            Users user = usersRepository.findByEmail(manageUserAccountReq.getUserEmail()); // orElseThrows(() -> new Exception("사용자를 찾을 수 없습니다."));
 
             Member member = new Member();
             member.setProject(project);

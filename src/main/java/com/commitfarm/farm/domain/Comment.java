@@ -22,7 +22,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private Users reporter;
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticketId")

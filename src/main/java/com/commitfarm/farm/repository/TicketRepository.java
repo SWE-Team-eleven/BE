@@ -15,7 +15,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByProject_ProjectIdAndDeveloper_UserIdAndStatus(Long projectId, Long userId, Status status);
     // used to get ticket List api
     List<Ticket> findByProject_ProjectIdAndCreatedTimeBetween(Long projectId, LocalDateTime start, LocalDateTime end);
-    List<Ticket> findAllByProjectId(Long projectId);
+
 
 
 }

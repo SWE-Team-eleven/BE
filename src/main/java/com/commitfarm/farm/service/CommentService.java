@@ -29,7 +29,7 @@ public class CommentService {
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new IllegalArgumentException("해당 티켓이 없습니다. id=" + ticketId));
 
         Comment comment = new Comment();
-        comment.setReporter(users);
+        comment.setUser(users);
         comment.setTicket(ticket);
         comment.setContent(dto.getContent());
         commentRepository.save(comment);
@@ -40,7 +40,7 @@ public class CommentService {
     public void deleteComment(Long userId,Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + commentId));
         Users reporter = usersRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId));
-        if(comment.getReporter() != reporter){
+        if(comment.getUser() != reporter){
             throw new IllegalArgumentException("해당 유저는 댓글을 삭제할 권한이 없습니다.");
         }
         commentRepository.deleteById(commentId);

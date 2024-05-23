@@ -1,6 +1,7 @@
 package com.commitfarm.farm.domain;
 
 import com.commitfarm.farm.domain.enumClass.UserType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,18 +28,22 @@ public class Users {
     private String email;
 
 
-
     private boolean isAdmin;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Member> members;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "reporter")
     private List<Ticket> reportedTickets;
 
+
+    @JsonIgnore
     @OneToMany(mappedBy = "developer")
     private List<Ticket> assignedTickets;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
 

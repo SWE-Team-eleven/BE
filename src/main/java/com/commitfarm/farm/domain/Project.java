@@ -1,6 +1,7 @@
 package com.commitfarm.farm.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class Project {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "project")
     private List<Member> members;
 
