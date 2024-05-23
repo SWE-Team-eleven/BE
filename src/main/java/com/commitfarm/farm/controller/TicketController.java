@@ -1,35 +1,100 @@
 package com.commitfarm.farm.controller;
 
+import com.commitfarm.farm.dto.ticket.request.CreateTicketDto;
+import com.commitfarm.farm.dto.ticket.request.UpdateStatusReq;
+import com.commitfarm.farm.dto.ticket.response.DetailTicketRes;
+import com.commitfarm.farm.dto.ticket.response.StaticsRes;
+import com.commitfarm.farm.dto.ticket.response.TicketListRes;
+import com.commitfarm.farm.service.TicketService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "티켓 API", description = "티켓 관련 API")// grouping by tag name
 @RestController
-@RequestMapping(value = "/api/ticket")
+@RequestMapping(value = "/api")
 public class TicketController {
 
-
+    @Autowired
+    private TicketService ticketService;
 // ticket crud
 
-    @PostMapping("/create")
-    public Result<?> createTicket(){
-        return new Result<>("createTicket");
-    }
-    @GetMapping("/read")
-    public Result<?> readTicket(){
-        return new Result<>("readTicket");
+    @PostMapping("/create/ticket/{projectId}")
+    @Operation(summary =  "티켓 생성 ", description = "projectId로 프로젝트 내 티켓 정보 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "생성됨 메세지"
+                    )
+            }
+    )
+    public CreateTicketDto createTicket(@PathVariable Long projectId, @RequestBody CreateTicketDto ticketDTO) {
+        return ticketService.createTicket(projectId, ticketDTO);
     }
 
-    @PutMapping("/update") // may de not use
-    public Result<?> updateTicket(){
-        return new Result<>("updateTicket");
+    @GetMapping("/read/ticket-list/{projectId}/{userId}")
+    @Operation(summary = "프로젝트 내, 내 티켓 리스트", description = "projectId로 프로젝트 내 티켓 정보 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "프로젝트 내 티켓 리스트를 반환함."
+                    )
+            }
+    )
+    public TicketListRes readTicketList(@PathVariable Long projectId, @PathVariable Long userId) {
+        return ticketService.readTicketList(projectId, userId);
+    }
+    @GetMapping("/read/ticket/{ticketId}")
+    @Operation(summary =  "티켓 상세 정보 ", description = "ticketId로  티켓 정보 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "프로젝트 내 티켓 상세 정보: 댓글등을 반환함."
+                    )
+            }
+    )
+    public DetailTicketRes readTicket(@PathVariable Long ticketId) {
+        return ticketService.readDetailTicket(ticketId);
     }
 
-    @DeleteMapping("/delete")//
-    public Result<?> deleteTicket(){
-        return new Result<>("deleteTicket");
+    @GetMapping("/read/ticket/statistics/{projectId}")
+    @Operation(summary = "티켓 status 통계", description = "projectId로 프로젝트 내 티켓 정보 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "이번 달 생성된 티켓의 Status (day/month)통계 정보를 반환함."
+                    )
+            }
+    )
+    public StaticsRes readTicketStatics(@PathVariable Long projectId) {
+        return ticketService.readTicketStatics(projectId);
+    }
+
+
+    @PutMapping("/update/ticket/status/{projectId}/{ticketId}/{userId}")
+    @Operation(summary = "U:티켓 업데이트 :status 변경", description = "ticketId로 티켓 status 변경",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "status 변경 성공"
+                    )
+            }
+    )
+    public String updateTicketStatus(@PathVariable Long projectId, @PathVariable Long ticketId, @PathVariable Long userId, @RequestBody UpdateStatusReq dto) {
+        return ticketService.updateTicketStatus(projectId, ticketId, userId, dto);
+    }
+
+
+
+
+    @DeleteMapping("/delete/{ticketId}")//
+    public void deleteTicket(@PathVariable  Long ticketId){
+        ticketService.deleteTicket( ticketId);
+
     }
 
 

@@ -1,23 +1,27 @@
 package com.commitfarm.farm.domain;
 
 
+import com.commitfarm.farm.domain.enumClass.Component;
+import com.commitfarm.farm.domain.enumClass.Priority;
+import com.commitfarm.farm.domain.enumClass.Status;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Ticket")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ticketId;
+    private Long ticketId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "milestoneId")
@@ -31,30 +35,28 @@ public class Ticket {
     @JoinColumn(name = "developerId")
     private Users developer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId")
+    private Project project;
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Status status;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
-    private Date createdTime;
+    private LocalDateTime createdTime;
 
-    @Column(nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private Date modifiedTime;
+    private LocalDateTime modifiedTime;
 
     @Enumerated(EnumType.STRING)
     private Component component;
 
-    public enum Status {
-        New, Assigned, Closed, Reopened
-    }
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    public enum Priority {
-        Blocker, Critical, Major, Minor, Trivial
-    }
+    private String title;
 
-    public enum Component {
-        UIComponent, DataAcessComponent, SecurityComponent
-    }
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 }

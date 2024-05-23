@@ -7,27 +7,30 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Comment")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Comment {
+// 5 attributes
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer commentId;
+    private Long commentId;
 
-    private String comment;
-
-    private Date timeStamp;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
+    private Users reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticketId")
     private Ticket ticket;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private Users user;
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    private LocalDateTime timeStamp;
+
 }

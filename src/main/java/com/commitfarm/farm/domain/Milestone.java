@@ -7,26 +7,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Milestone")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Milestone {
+//6 attributes
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer milestoneId;
+    private Long milestoneId;
 
-    @Column(nullable = false)
     private String name;
 
-    private Date startDate;
-    private Date dueDate;
-    private String comment;
+    private LocalDate startDate;
+    //LocalDate: mapped DATE tpe in DB
+    private LocalDate dueDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectId")
-    private Project project;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+
+    @OneToMany(mappedBy = "milestone")
+    private List<Ticket> tickets;
 }

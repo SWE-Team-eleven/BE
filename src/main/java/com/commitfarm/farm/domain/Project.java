@@ -8,22 +8,39 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Project")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer projectId;
+    private Long projectId;
 
-    @Column(nullable = false)
     private String name;
 
-    private String comment;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
+    @Temporal(TemporalType.DATE)
     private Date startDate;
+
+    @Temporal(TemporalType.DATE)
     private Date endDate;
+
+    @OneToMany(mappedBy = "project")
+    private List<Member> members;
+
+    public static Project saveProject(String name, String description, Date startDate, Date endDate) {
+        Project project = new Project();
+        project.setName(name);
+        project.setStartDate(startDate);
+        project.setEndDate(endDate);
+        project.setDescription(description);
+
+        return project;
+    }
 }
