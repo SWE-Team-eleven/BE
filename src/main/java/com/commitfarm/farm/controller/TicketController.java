@@ -32,8 +32,8 @@ public class TicketController {
                     )
             }
     )
-    public CreateTicketDto createTicket(@PathVariable Long projectId, @RequestBody CreateTicketDto ticketDTO) {
-        return ticketService.createTicket(projectId, ticketDTO);
+    public void createTicket(@PathVariable Long projectId, @RequestBody CreateTicketDto ticketDTO) {
+         ticketService.createTicket(projectId, ticketDTO);
     }
 
     @GetMapping("/read/ticket-list/{projectId}/{userId}")
@@ -58,7 +58,7 @@ public class TicketController {
             }
     )
     public DetailTicketRes readTicket(@PathVariable Long ticketId) {
-        return ticketService.readDetailTicket(ticketId);
+         return ticketService.readDetailTicket(ticketId);
     }
 
 

@@ -43,15 +43,15 @@ public class TicketService {
     private static final EnumSet<Status> TESTER_STATUSES = EnumSet.of(Status.New, Status.Reopened);
 
     @Transactional
-    public CreateTicketDto createTicket(Long projectId, CreateTicketDto ticketDTO) {
+    public void createTicket(Long projectId, CreateTicketDto ticketDTO) {
         Ticket ticket = new Ticket();
 
-        // automatically assign time
+        // automatically assign time when created -(오슬희)
         LocalDateTime now = LocalDateTime.now();
 
         ticket.setMilestone(ticketDTO.getMilestone());
         ticket.setReporter(ticketDTO.getReporter());
-        ticket.setStatus(Status.New); // always set to New when created
+        ticket.setStatus(Status.New); // always set to New when created -(오슬희) : Because it is a new! create ticket
         ticket.setPriority(ticketDTO.getPriority());
         ticket.setCreatedTime(now);
         ticket.setModifiedTime(now);
@@ -59,25 +59,28 @@ public class TicketService {
         ticket.setDescription(ticketDTO.getDescription());
         ticket.setTitle(ticketDTO.getTitle());
 
+        //here is the algorithm to automatically assign developer to the ticket -(오슬희)
+        // algorithm step1: get all developers in the project -(오슬희)
+        // algorithm step2: get the developer with tickets assigned number info ? -(오슬희) - 개발자 별로 할당된 티켓 수를 구하란 뜻임 영어가 안되서 미안
+        //algorithm step3: if number info is same, compare the number of tickets assigned -(오슬희)
         Project project = projectRepository.findByProjectId(projectId);
 
-        // get developers in the project
-        List<Member> developers = memberRepository.findAllByProjectAndUserType(project, UserType.Developer);
-
-        // get the developer with the least number of tickets assigned
+        // get developers in this project -(오슬희)
+        // get the developer with the least number of tickets assigned -(오슬희)
+        List<Member> developers = memberRepository.findAllByProjectAndUserType(project, UserType.Developer); // change optioal<user> to mapping -(오슬희)
         Optional<Users> assignedDeveloper = developers.stream()
                 .collect(Collectors.groupingBy(Member::getUser, Collectors.summingInt(dev -> (int) ticketRepository.countByComponentAndDeveloper(ticketDTO.getComponent(), dev.getUser()))))
                 .entrySet().stream()
                 .sorted((entry1, entry2) -> {
                     int cmp = entry2.getValue().compareTo(entry1.getValue());
                     if (cmp == 0) {
-                        // 동일한 티켓 수일 경우, 할당된 티켓 수로 비교
+                        // 동일한 티켓 수일 경우, 할당된 티켓 수로 비교-(오슬희)
                         long dev1AssignedCount = ticketRepository.countByDeveloperAndStatus(entry1.getKey(), Status.Assigned);
                         long dev2AssignedCount = ticketRepository.countByDeveloperAndStatus(entry2.getKey(), Status.Assigned);
                         cmp = Long.compare(dev1AssignedCount, dev2AssignedCount);
                     }
                     if (cmp == 0) {
-                        // 동일한 할당된 티켓 수일 경우, 사용자 ID로 비교
+                        // 동일한 할당된 티켓 수일 경우, 사용자 ID로 비교-(오슬희)
                         cmp = entry1.getKey().getUserId().compareTo(entry2.getKey().getUserId());
                     }
                     return cmp;
@@ -86,36 +89,54 @@ public class TicketService {
                 .findFirst();
 
         assignedDeveloper.ifPresent(ticket::setDeveloper);
+        Ticket savedTicket = ticketRepository.save(ticket);// you can save and delete variable (if you want to 반환 use this variable: savedTicket) - (오슬희)
 
-        Ticket savedTicket = ticketRepository.save(ticket);
-
-        CreateTicketDto responseDto = new CreateTicketDto();
-        responseDto.setMilestone(savedTicket.getMilestone());
-        responseDto.setReporter(savedTicket.getReporter());
-        responseDto.setStatus(savedTicket.getStatus());
-        responseDto.setPriority(savedTicket.getPriority());
-        responseDto.setCreatedTime(savedTicket.getCreatedTime());
-        responseDto.setModifiedTime(savedTicket.getModifiedTime());
-        responseDto.setComponent(savedTicket.getComponent());
-        responseDto.setDescription(savedTicket.getDescription());
-        responseDto.setTitle(savedTicket.getTitle());
-
-        return responseDto;
     }
     @Transactional(readOnly = true)
     public TicketListRes readTicketList(Long projectId, Long userId) {
-        // 사용자 타입 확인
+        // join MemberTable to check usertype (-오슬희)
         Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+//
+//        if ((member.getUserType() != UserType.Tester)||(member.getUserType() != UserType.Developer)) {
+//            throw new IllegalArgumentException("해당 사용자는 개발자가가 아닙니다.");
+//        }
 
-        if (member.getUserType() != UserType.Developer) {
-            throw new IllegalArgumentException("해당 사용자는 개발자가 아닙니다.");
-        }
+// if you read this code, 갗이 고민좀? -(오슬희) 개발자 입장에서 짠거라 약간 어색함
 
-        Users user = member.getUser();
+        UserType actor = member.getUserType();
 
-        // Assigned 티켓 리스트 조회
-        List<TicketListRes.TicketInfo> assignedTickets = ticketRepository.findByProject_ProjectIdAndDeveloper_UserIdAndStatus(projectId, userId, Status.Assigned)
+//        List<TicketListRes.TicketInfo> tickets = switch (actor) {
+//            case ProjectLeader -> ticketRepository.findByProject_ProjectId(projectId)
+//                    .stream()
+//                    .map(ticket -> new TicketListRes.TicketInfo(
+//                            ticket.getTitle(),
+//                            ticket.getStatus().toString(),
+//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+//                    ))
+//                    .collect(Collectors.toList());
+//            case Developer -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
+//                    .stream()
+//                    .map(ticket -> new TicketListRes.TicketInfo(
+//                            ticket.getTitle(),
+//                            ticket.getStatus().toString(),
+//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+//                    ))
+//                    .collect(Collectors.toList());
+//            case Tester -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
+//                    .stream()
+//                    .map(ticket -> new TicketListRes.TicketInfo(
+//                            ticket.getTitle(),
+//                            ticket.getStatus().toString(),
+//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+//                    ))
+//                    .collect(Collectors.toList());
+//        };
+//
+
+        // Get: Assigned ticket List - (오슬희)
+        List<TicketListRes.TicketInfo> assignedTickets =
+                ticketRepository.findByProject_ProjectIdAndDeveloper_UserIdAndStatus(projectId, userId, Status.Assigned)
                 .stream()
                 .map(ticket -> new TicketListRes.TicketInfo(
                         ticket.getTitle(),
@@ -124,8 +145,9 @@ public class TicketService {
                 ))
                 .collect(Collectors.toList());
 
-        // Closed 티켓 리스트 조회
-        List<TicketListRes.TicketInfo> closedTickets = ticketRepository.findByProject_ProjectIdAndDeveloper_UserIdAndStatus(projectId, userId, Status.Closed)
+        // Get: Closed ticket List -(오슬희)
+        List<TicketListRes.TicketInfo> closedTickets =
+                ticketRepository.findByProject_ProjectIdAndDeveloper_UserIdAndStatus(projectId, userId, Status.Closed)
                 .stream()
                 .map(ticket -> new TicketListRes.TicketInfo(
                         ticket.getTitle(),
@@ -166,9 +188,10 @@ public class TicketService {
 
     @Transactional(readOnly = true)
     public StaticsRes readTicketStatics(Long projectId) {
+        //read ticket that created today and this month per List -(오슬희)
         LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
         LocalDateTime endOfToday = startOfToday.plusDays(1);
-
+        //get this month info from now()-(오슬희)
         YearMonth thisMonth = YearMonth.now();
         LocalDateTime startOfMonth = thisMonth.atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = thisMonth.atEndOfMonth().atTime(23, 59, 59);
@@ -188,7 +211,7 @@ public class TicketService {
     public String updateTicketStatus(Long projectId, Long ticketId, Long userId, UpdateStatusReq dto) {
         Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
-
+        //have to join member table to get user type so, you can check the user Authority -(오슬희)
         UserType userType = member.getUserType();
         Status newStatus = dto.getStatus();
 
