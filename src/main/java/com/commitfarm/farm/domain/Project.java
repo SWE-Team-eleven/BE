@@ -26,6 +26,7 @@ public class Project {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // @CreationTimestamp //proj created times != start time
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
