@@ -33,13 +33,10 @@ api 명세가 바뀔 것을 대비해서 Get은 컨트롤러 단에서 Result<> 
 
 
 ### Additional Links : 참고 자료
-* [Spring에서 날짜 다루기](https://ozofweird.tistory.com/entry/%EC%82%BD%EC%A7%88-%ED%94%BC%ED%95%98%EA%B8%B0-Spring-Boot-%EB%82%A0%EC%A7%9C-%EB%8B%A4%EB%A3%A8%EA%B8%B0?category=938335)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Handling Form Submission](https://spring.io/guides/gs/handling-form-submission/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
-* [Securing a Web Application](https://spring.io/guides/gs/securing-web/)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#data.sql.jpa-and-spring-data)
-* [Spring Security](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#web.security)
-* [JDBC API](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#data.sql)
-* [Spring Data JDBC](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#data.sql.jdbc)
+* [생성 날짜를 자동으로 찍자](https://ozofweird.tistory.com/entry/%EC%82%BD%EC%A7%88-%ED%94%BC%ED%95%98%EA%B8%B0-Spring-Boot-%EB%82%A0%EC%A7%9C-%EB%8B%A4%EB%A3%A8%EA%B8%B0?category=938335)
+* [REST 튜토리얼](https://spring.io/guides/tutorials/rest/)
+* [Submission 핸들링하기](https://spring.io/guides/gs/handling-form-submission/)
+* [JPA 공식 문서](https://spring.io/guides/gs/accessing-data-jpa/)
+* [JPA 공식 문서2](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#data.sql.jpa-and-spring-data)
+* [API명세서를 자동으로 써보자 : Swagger 버전 바뀜 참고](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#web.security)
 

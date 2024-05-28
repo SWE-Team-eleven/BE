@@ -2,6 +2,7 @@ package com.commitfarm.farm.controller;
 
 import com.commitfarm.farm.dto.ticket.request.CreateTicketDto;
 import com.commitfarm.farm.dto.ticket.request.UpdateStatusReq;
+import com.commitfarm.farm.dto.ticket.response.AssignedTicketListRes;
 import com.commitfarm.farm.dto.ticket.response.DetailTicketRes;
 import com.commitfarm.farm.dto.ticket.response.StaticsRes;
 import com.commitfarm.farm.dto.ticket.response.TicketListRes;
@@ -13,6 +14,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "티켓 API", description = "티켓 관련 API")// grouping by tag name
 @RestController
@@ -48,8 +51,22 @@ public class TicketController {
     public TicketListRes readTicketList(@PathVariable Long projectId, @PathVariable Long userId) {
         return ticketService.readTicketList(projectId, userId);
     }
+
+
+    @GetMapping("/read/assigned/ticket-list/{projectId}/{userId}")
+    @Operation(summary = "프로젝트 내, 내 Assigned티켓 리스트", description = "projectId로 프로젝트 내 티켓 정보 반환",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "프로젝트 내 티켓 리스트를 반환함."
+                    )
+            }
+    )
+    public List<AssignedTicketListRes> readAssignedTicketList(@PathVariable Long projectId, @PathVariable Long userId) {
+        return ticketService.readAssignedTicketList(projectId, userId);
+    }
     @GetMapping("/read/ticket/{ticketId}")
-    @Operation(summary =  "티켓 상세 정보 ", description = "ticketId로  티켓 정보 반환",
+    @Operation(summary =  "티켓 리스트 정보 ", description = "ticketId로  티켓 정보 반환",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -57,6 +74,9 @@ public class TicketController {
                     )
             }
     )
+
+
+
     public DetailTicketRes readTicket(@PathVariable Long ticketId) {
          return ticketService.readDetailTicket(ticketId);
     }

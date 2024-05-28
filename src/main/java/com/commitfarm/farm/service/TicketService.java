@@ -4,6 +4,7 @@ import com.commitfarm.farm.domain.*;
 import com.commitfarm.farm.domain.enumClass.*;
 import com.commitfarm.farm.dto.ticket.request.CreateTicketDto;
 import com.commitfarm.farm.dto.ticket.request.UpdateStatusReq;
+import com.commitfarm.farm.dto.ticket.response.AssignedTicketListRes;
 import com.commitfarm.farm.dto.ticket.response.DetailTicketRes;
 import com.commitfarm.farm.dto.ticket.response.StaticsRes;
 import com.commitfarm.farm.dto.ticket.response.TicketListRes;
@@ -106,33 +107,33 @@ public class TicketService {
 
         UserType actor = member.getUserType();
 
-//        List<TicketListRes.TicketInfo> tickets = switch (actor) {
-//            case ProjectLeader -> ticketRepository.findByProject_ProjectId(projectId)
-//                    .stream()
-//                    .map(ticket -> new TicketListRes.TicketInfo(
-//                            ticket.getTitle(),
-//                            ticket.getStatus().toString(),
-//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-//                    ))
-//                    .collect(Collectors.toList());
-//            case Developer -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
-//                    .stream()
-//                    .map(ticket -> new TicketListRes.TicketInfo(
-//                            ticket.getTitle(),
-//                            ticket.getStatus().toString(),
-//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-//                    ))
-//                    .collect(Collectors.toList());
-//            case Tester -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
-//                    .stream()
-//                    .map(ticket -> new TicketListRes.TicketInfo(
-//                            ticket.getTitle(),
-//                            ticket.getStatus().toString(),
-//                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-//                    ))
-//                    .collect(Collectors.toList());
-//        };
-//
+        List<TicketListRes.TicketInfo> tickets = switch (actor) {
+            case ProjectLeader -> ticketRepository.findByProject_ProjectId(projectId)
+                    .stream()
+                    .map(ticket -> new TicketListRes.TicketInfo(
+                            ticket.getTitle(),
+                            ticket.getStatus().toString(),
+                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    ))
+                    .collect(Collectors.toList());
+            case Developer -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
+                    .stream()
+                    .map(ticket -> new TicketListRes.TicketInfo(
+                            ticket.getTitle(),
+                            ticket.getStatus().toString(),
+                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    ))
+                    .collect(Collectors.toList());
+            case Tester -> ticketRepository.findByProject_ProjectIdAndDeveloper_UserId(projectId, userId)
+                    .stream()
+                    .map(ticket -> new TicketListRes.TicketInfo(
+                            ticket.getTitle(),
+                            ticket.getStatus().toString(),
+                            ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    ))
+                    .collect(Collectors.toList());
+        };
+
 
         // Get: Assigned ticket List - (오슬희)
         List<TicketListRes.TicketInfo> assignedTickets =
@@ -159,7 +160,26 @@ public class TicketService {
         return new TicketListRes(assignedTickets, closedTickets);
     }
 
+    @Transactional(readOnly = true)
+    public List<AssignedTicketListRes> readAssignedTicketList(Long projectId, Long userId) {
+        Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
 
+        UserType userType = member.getUserType();
+        if (userType != UserType.Developer && userType != UserType.ProjectLeader ) {
+            throw new IllegalArgumentException("해당 사용자는 권한이 없습니다.");
+        }
+
+        List<Ticket> assignedTickets = ticketRepository.findByProject_ProjectIdAndStatus(projectId, Status.Assigned);
+
+        return assignedTickets.stream()
+                .map(ticket -> new AssignedTicketListRes(
+                        ticket.getTitle(),
+                        ticket.getPriority(),
+                        ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                ))
+                .collect(Collectors.toList());
+    }
     @Transactional
     public DetailTicketRes readDetailTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)
