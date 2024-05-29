@@ -32,6 +32,61 @@ get 으로 조회시 Entitiy가 그대로 노출되면 Domian 단에 프록시.L
 api 명세가 바뀔 것을 대비해서 Get은 컨트롤러 단에서 Result<> 제네릭으로 감싸주ㅝ야함 
 
 
+# 함수 및 기능, 로직 설명
+## 1. 티켓 관련 로직
+
+* ### 티켓 생성
+(optioal) 이슈(티켓) 생성 시 개발자 자동 할당 알고리즘
+Ticket 생성시 자동으로 현재 시간 찍혀야 함
+* createTicket
+
+티켓을 생성 시 같은 프로젝트에 참여하고 있는 Member 중에 UserType이 Developer인 사람에게 티켓을 자동 할당해야함 
+이때 현재 발행 한 티켓의 Component 가 같은 티켓 중에  (UserType이 Developer인 사람에게) 티켓의 DeveloperID에 가장 많이 들어있는 사람(DeveloperID가 많다는 것은 같은 컴포넌트 티켓을 처리해본 경험이 많다고 가정) 을 자동으로 할당하고, 
+만약 그 수가 2명 이상이면, 현재 Developer에게 할당된 티켓 중 Status 가 assigned가 가장 적은 사람에게(가장 덜 바쁠 것이라는 가정) 할당
+만약 그 수가 2명 이상이면 id가 작은대로 할당해
+
+* ### 티켓 (이슈) 검색 기능
+* readAssignedTicketList
+* readNewTicketList
+* readResolvedTicketList
+* readReopenedTicketList
+* readClosedTicketList
+
+현재 진행 중인 프로젝트 클릭 시 프로젝트 내 티켓(이슈) 중, status에 따라 분류하여 볼수 있어야 함.
+이에 따라 검색하여 보길 원하는 프로젝트 내 project id를 받아와 해당 프로젝트 내 티켓을 status에 따라 분류하여 보여주는 기능을 구현
+
+### 티켓 (이슈) 통계 기능 : 
+* readTicketStatics
+
+projectId로 프로젝트 내에 포함된 티켓을 찾아서
+오늘을 기준으로 createdTime이 오늘인 Ticket의 Status 별 갯수와 priority 별 갯수,
+마찬가지로 createdTime이 이번 달인  Ticket의 Status 별 갯수와 priority 별 갯수, 를 따로 통계치를 보여 줘야
+현재 시점 일,월의 info 를 반환 받아, 이번달, 오늘의 티켓 상태(status), 우선 순위(priority) 별 카운트하여 프론트 측에 전달
+
+* ### 티켓 (이슈) 상세 조회
+* readTicketDetail
+
+티켓을 클릭시 티켓에 달린 댓글을 포함해서 티켓의 상세 정보를 볼수있어야함
+
+* ### 티켓 (이슈) status 변경
+* updateTicketStatus(수정 중)
+projectId로 프로젝트 와 UserId 를 통해 Member테이블의 UserType을 찾아
+UserType이 ProjectLeader이면 티켓의 Status를 Assigned,Closed로 변경 할 수 있다.
+UserType이 Developer 면  티켓의 Status를 Resolved로 변경 할 수 있다.
+UserType이 Tester 면 New,Reopened 로 티켓의 Status를 로 변경 할 수 있다.
+-> 전체 수정? 
+* ### 티켓 (이슈) 삭제
+
+
+
+## 유저
+
+## 프로젝트
+
+
+## 댓글
+댓글은 티켓에만 달 수 있음을 기반으로 구현
+
 ### Additional Links : 참고 자료
 * [생성 날짜를 자동으로 찍자](https://ozofweird.tistory.com/entry/%EC%82%BD%EC%A7%88-%ED%94%BC%ED%95%98%EA%B8%B0-Spring-Boot-%EB%82%A0%EC%A7%9C-%EB%8B%A4%EB%A3%A8%EA%B8%B0?category=938335)
 * [REST 튜토리얼](https://spring.io/guides/tutorials/rest/)
@@ -39,4 +94,5 @@ api 명세가 바뀔 것을 대비해서 Get은 컨트롤러 단에서 Result<> 
 * [JPA 공식 문서](https://spring.io/guides/gs/accessing-data-jpa/)
 * [JPA 공식 문서2](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#data.sql.jpa-and-spring-data)
 * [API명세서를 자동으로 써보자 : Swagger 버전 바뀜 참고](https://docs.spring.io/spring-boot/docs/3.2.5/reference/htmlsingle/index.html#web.security)
+
 
