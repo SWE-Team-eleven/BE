@@ -4,10 +4,7 @@ import com.commitfarm.farm.domain.*;
 import com.commitfarm.farm.domain.enumClass.*;
 import com.commitfarm.farm.dto.ticket.request.CreateTicketDto;
 import com.commitfarm.farm.dto.ticket.request.UpdateStatusReq;
-import com.commitfarm.farm.dto.ticket.response.AssignedTicketListRes;
-import com.commitfarm.farm.dto.ticket.response.DetailTicketRes;
-import com.commitfarm.farm.dto.ticket.response.StaticsRes;
-import com.commitfarm.farm.dto.ticket.response.TicketListRes;
+import com.commitfarm.farm.dto.ticket.response.*;
 import com.commitfarm.farm.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -180,6 +177,88 @@ public class TicketService {
                 ))
                 .collect(Collectors.toList());
     }
+    @Transactional(readOnly = true)
+    public List<NewTicketListRes> readNewTicketList(Long projectId, Long userId) {
+        Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        UserType userType = member.getUserType();
+        if (userType != UserType.Developer && userType != UserType.ProjectLeader ) {
+            throw new IllegalArgumentException("해당 사용자는 권한이 없습니다.");
+        }
+
+        List<Ticket> newTickets = ticketRepository.findByProject_ProjectIdAndStatus(projectId, Status.Assigned);
+
+        return newTickets.stream()
+                .map(ticket -> new NewTicketListRes(
+                        ticket.getTitle(),
+                        ticket.getPriority(),
+                        ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ResolvedTicketListRes> readResolvedTicketList(Long projectId, Long userId) {
+        Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        UserType userType = member.getUserType();
+        if (userType != UserType.Developer && userType != UserType.ProjectLeader ) {
+            throw new IllegalArgumentException("해당 사용자는 권한이 없습니다.");
+        }
+
+        List<Ticket> ticketList = ticketRepository.findByProject_ProjectIdAndStatus(projectId, Status.Assigned);
+
+        return ticketList.stream()
+                .map(ticket -> new ResolvedTicketListRes(
+                        ticket.getTitle(),
+                        ticket.getPriority(),
+                        ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                ))
+                .collect(Collectors.toList());
+    }
+    @Transactional(readOnly = true)
+    public List<ReopenedTicketListRes> readReopenedTicketList(Long projectId, Long userId) {
+        Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        UserType userType = member.getUserType();
+        if (userType != UserType.Developer && userType != UserType.ProjectLeader ) {
+            throw new IllegalArgumentException("해당 사용자는 권한이 없습니다.");
+        }
+
+        List<Ticket> ticketList = ticketRepository.findByProject_ProjectIdAndStatus(projectId, Status.Assigned);
+
+        return ticketList.stream()
+                .map(ticket -> new ReopenedTicketListRes(
+                        ticket.getTitle(),
+                        ticket.getPriority(),
+                        ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                ))
+                .collect(Collectors.toList());
+    }
+    @Transactional(readOnly = true)
+    public List<ClosedTicketListRes> readClosedTicketList(Long projectId, Long userId) {
+        Member member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        UserType userType = member.getUserType();
+        if (userType != UserType.Developer && userType != UserType.ProjectLeader ) {
+            throw new IllegalArgumentException("해당 사용자는 권한이 없습니다.");
+        }
+
+        List<Ticket> ticketList = ticketRepository.findByProject_ProjectIdAndStatus(projectId, Status.Assigned);
+
+        return ticketList.stream()
+                .map(ticket -> new ClosedTicketListRes(
+                        ticket.getTitle(),
+                        ticket.getPriority(),
+                        ticket.getCreatedTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                ))
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public DetailTicketRes readDetailTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId)

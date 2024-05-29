@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReoppenedTicketListRes {
+public class ReopenedTicketListRes {
     @Schema(description = "티켓 이름")
     private String title;
 
@@ -22,4 +22,11 @@ public class ReoppenedTicketListRes {
 
     @Schema(description = "티켓 생성 시간")
     private String createdTime;
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReopenedTicketList {
+        private List<ReopenedTicketListRes> reopenedTickets;
+    }
 }

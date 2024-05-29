@@ -21,4 +21,11 @@ public class ResolvedTicketListRes {
 
     @Schema(description = "티켓 생성 시간")
     private String createdTime;
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ResolvedTicketList {
+        private List<ResolvedTicketList> resolvedTicketListTickets;
+    }
 }
