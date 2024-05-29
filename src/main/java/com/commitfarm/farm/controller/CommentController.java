@@ -40,7 +40,6 @@ public class CommentController {
 
 
     @DeleteMapping("/delete/{commentId}")
-    @PostMapping("/create/comment/{usersId}/{ticketId}")
     @Operation(summary =  "댓글 삭제 ", description = "userId : reporter (only reporter can delete), ticketId : ticketId로 해당 티켓에 댓글 생성",
             responses = {
                     @ApiResponse(
